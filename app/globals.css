@@ -80,3 +80,49 @@ body {
 .animate-in {
   animation: fade-rise 0.16s ease-out;
 }
+
+/*
+ * Diff colours for the version-preview view. @codemirror/merge ships light
+ * defaults, so the dark theme needs its own.
+ */
+.cm-merge-revert {
+  display: none;
+}
+
+.cm-insertedLine,
+.cm-changedLine {
+  background: color-mix(in srgb, var(--color-ok) 12%, transparent) !important;
+}
+
+.cm-insertedLine::before,
+.cm-deletedChunk::before {
+  position: absolute;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  content: "";
+}
+
+.cm-insertedLine::before {
+  background: var(--color-ok);
+}
+
+.cm-deletedChunk {
+  position: relative;
+  background: color-mix(in srgb, var(--color-bad) 12%, transparent) !important;
+  color: var(--color-ink-dim);
+}
+
+.cm-deletedChunk::before {
+  background: var(--color-bad);
+}
+
+.cm-changedText {
+  background: color-mix(in srgb, var(--color-ok) 26%, transparent) !important;
+  border-radius: 2px;
+}
+
+.cm-deletedChunk .cm-deletedText {
+  background: color-mix(in srgb, var(--color-bad) 30%, transparent) !important;
+  border-radius: 2px;
+}

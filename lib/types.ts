@@ -82,5 +82,16 @@ export interface SaveResult {
   path: string;
   size: number;
   mtime: number;
-  backup?: string;
+  /** The snapshot taken of the previous content, if there was any. */
+  captured?: Version;
+  /** Set when the content already matched disk, so nothing was written. */
+  unchanged?: boolean;
+}
+
+/** A previous state of a config file, kept under `data/versions`. */
+export interface Version {
+  /** Epoch milliseconds, as a string. Also the on-disk filename. */
+  id: string;
+  savedAt: number;
+  size: number;
 }

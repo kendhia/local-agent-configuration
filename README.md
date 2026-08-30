@@ -45,11 +45,31 @@ button writes it.
 - **JSON, JSONC, TOML and YAML are parsed before anything touches disk.** A
   syntax error shows in the status bar and the save is refused, so a bad edit
   cannot break an agent's config.
-- **The previous version is copied to `data/backups/` on every save.**
 - Writes go to a temp file and are then renamed, so an interrupted save cannot
   leave a truncated config behind.
 - If the file changed on disk since you opened it, the save stops and offers to
   overwrite rather than silently clobbering the other change.
+- Writing bytes identical to what is already on disk is a no-op, so nothing is
+  touched and no version is recorded.
+
+## Version history
+
+Every save records the content it replaced. Open **History** in the editor
+toolbar to see them, newest first, with the size difference against what is on
+disk now.
+
+Selecting a version shows a diff rather than dropping you into raw text: green
+is what restoring would add, red what it would remove. **Restore this version**
+then writes it back.
+
+A restore is itself a save, so the content it replaced is added to the history
+too — rolling back is always undoable. Restores skip syntax validation on
+purpose: a version is a byte-exact record of what was on disk, and the point of
+restoring is to get exactly that back.
+
+Up to 50 versions are kept per file, under `data/versions/<name>-<hash>/`, one
+file per version named after its timestamp. The trash icon in the History panel
+discards a file's history without touching the file.
 
 ## Safety
 
@@ -67,13 +87,15 @@ button writes it.
 app/api/snapshot   scan everything, grouped by scope and agent
 app/api/file       read / write a single config
 app/api/projects   add, remove and configure project folders
+app/api/versions   list, read and restore stored versions
 app/api/browse     directory listing for the folder picker
 app/api/reveal     reveal a file in Finder
 lib/agents.ts      the agent registry — which globs belong to which agent
 lib/scan.ts        globbing, symlink de-duplication, subfolder attribution
-lib/fileio.ts      backup, validate, atomic write
+lib/fileio.ts      validate, snapshot, atomic write, restore
+lib/versions.ts    version storage, listing, pruning
 lib/paths.ts       path allow-listing and credential-file refusal
-data/              registered projects and pre-save backups (gitignored)
+data/              registered projects and stored versions (gitignored)
 ```
 
 ## Notes

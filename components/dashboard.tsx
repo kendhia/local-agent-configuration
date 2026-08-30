@@ -107,8 +107,8 @@ function Welcome({
         </span>
         <h2 className="mt-4 text-base font-semibold">Pick a config to edit</h2>
         <p className="mt-1.5 text-sm text-ink-dim">
-          {files} configuration files across {agents} agents. Edits save straight to disk, and the
-          previous version is kept under <code className="font-mono text-xs">data/backups</code>.
+          {files} configuration files across {agents} agents. Edits save straight to disk,
+          and every save records the content it replaced so you can roll back to it.
         </p>
 
         <div className="mt-6 flex items-center justify-center gap-3">

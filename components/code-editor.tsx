@@ -11,6 +11,7 @@ import { StreamLanguage } from "@codemirror/language";
 import { toml } from "@codemirror/legacy-modes/mode/toml";
 import { shell } from "@codemirror/legacy-modes/mode/shell";
 import { EditorView, keymap } from "@codemirror/view";
+import { unifiedMergeView } from "@codemirror/merge";
 import { Prec } from "@codemirror/state";
 import type { Language } from "@/lib/types";
 
@@ -65,14 +66,29 @@ interface Props {
   value: string;
   language: Language;
   readOnly?: boolean;
+  /**
+   * When set, the editor renders as a diff instead: this is the "before" side,
+   * and `value` is the "after". Used to preview what restoring a version does.
+   */
+  diffBase?: string;
   onChange: (value: string) => void;
   onSave: () => void;
 }
 
-export default function CodeEditor({ value, language, readOnly, onChange, onSave }: Props) {
+export default function CodeEditor({
+  value,
+  language,
+  readOnly,
+  diffBase,
+  onChange,
+  onSave,
+}: Props) {
   const extensions = useMemo(
     () => [
       ...extensionsFor(language),
+      ...(diffBase === undefined
+        ? []
+        : [unifiedMergeView({ original: diffBase, mergeControls: false, highlightChanges: true })]),
       EditorView.lineWrapping,
       // Prec.highest so Cmd+S beats any default binding and never hits the browser.
       Prec.highest(
@@ -88,7 +104,7 @@ export default function CodeEditor({ value, language, readOnly, onChange, onSave
         ]),
       ),
     ],
-    [language, onSave],
+    [language, onSave, diffBase],
   );
 
   return (
