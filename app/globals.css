@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #0b0d12;
+  --color-surface: #12151c;
+  --color-surface-2: #171b24;
+  --color-raised: #1d222d;
+  --color-line: #262c38;
+  --color-line-soft: #1e2431;
+  --color-ink: #e6e9ef;
+  --color-ink-dim: #9aa4b8;
+  --color-ink-faint: #5f6b80;
+  --color-accent: #6c8cff;
+  --color-accent-soft: #1b2340;
+  --color-ok: #4ade80;
+  --color-warn: #fbbf24;
+  --color-bad: #f87171;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4353;
+  background-clip: content-box;
+}
+
+/* CodeMirror is styled inline via a theme extension; these cover the shell. */
+.cm-editor {
+  height: 100%;
+  background: transparent;
+}
+.cm-editor.cm-focused {
+  outline: none;
+}
+.cm-scroller {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-in {
+  animation: fade-rise 0.16s ease-out;
+}
