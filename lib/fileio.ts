@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 import { detectLanguage, tildify } from "./paths";
-import { BACKUP_DIR } from "./store";
+import { captureVersion, readVersion } from "./versions";
 import { validate } from "./validate";
 import type { FilePayload, SaveResult } from "./types";
 
@@ -59,22 +59,6 @@ export class ValidationError extends Error {
   }
 }
 
-async function backup(abs: string): Promise<string | undefined> {
-  try {
-    const existing = await fs.readFile(abs);
-    const hash = crypto.createHash("sha1").update(abs).digest("hex").slice(0, 8);
-    const dir = path.join(BACKUP_DIR, `${path.basename(abs)}-${hash}`);
-    await fs.mkdir(dir, { recursive: true });
-    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const target = path.join(dir, `${stamp}${path.extname(abs) || ".bak"}`);
-    await fs.writeFile(target, existing);
-    return target;
-  } catch {
-    // No prior content (new file) or unreadable — nothing to preserve.
-    return undefined;
-  }
-}
-
 export async function writeConfigFile(
   abs: string,
   content: string,
@@ -93,6 +77,13 @@ export async function writeConfigFile(
     if (options.expectedMtime !== undefined && Math.abs(stat.mtimeMs - options.expectedMtime) > 1) {
       throw new WriteConflictError(stat.mtimeMs);
     }
+
+    // Writing identical bytes would bump the mtime and record a version that
+    // says nothing. Restoring a version twice is the usual way to hit this.
+    if ((await fs.readFile(abs, "utf8")) === content) {
+      return { path: abs, size: stat.size, mtime: stat.mtimeMs, unchanged: true };
+    }
+
     mode = stat.mode;
   } catch (err) {
     if (err instanceof WriteConflictError) throw err;
@@ -100,7 +91,8 @@ export async function writeConfigFile(
     await fs.mkdir(path.dirname(abs), { recursive: true });
   }
 
-  const backupPath = await backup(abs);
+  // Snapshot the outgoing content so this save can be rolled back.
+  const captured = await captureVersion(abs);
 
   // Write to a sibling temp file then rename, so a crash cannot truncate the
   // original. The suffix is random rather than pid-based: two saves of the same
@@ -119,5 +111,18 @@ export async function writeConfigFile(
   }
 
   const stat = await fs.stat(abs);
-  return { path: abs, size: stat.size, mtime: stat.mtimeMs, backup: backupPath };
+  return { path: abs, size: stat.size, mtime: stat.mtimeMs, captured: captured ?? undefined };
+}
+
+/**
+ * Rolls a file back to a stored version. The current content is snapshotted
+ * first, so a restore can itself be undone.
+ *
+ * Validation is skipped deliberately: a version is a byte-exact record of what
+ * was on disk, and the point of restoring is to get exactly that back. Files
+ * predating the dashboard may never have parsed cleanly in the first place.
+ */
+export async function restoreVersion(abs: string, id: string): Promise<SaveResult> {
+  const content = await readVersion(abs, id);
+  return writeConfigFile(abs, content, { skipValidation: true });
 }

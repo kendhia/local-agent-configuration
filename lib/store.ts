@@ -11,7 +11,7 @@ export interface AppState {
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const STATE_FILE = path.join(DATA_DIR, "state.json");
-export const BACKUP_DIR = path.join(DATA_DIR, "backups");
+export const VERSIONS_DIR = path.join(DATA_DIR, "versions");
 
 const DEFAULT_STATE: AppState = { projects: [], scanDepth: 6 };
 
