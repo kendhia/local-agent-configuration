@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 4321",
+    "dev": "next dev --hostname 127.0.0.1 --port 4321",
     "build": "next build",
-    "start": "next start --port 4321",
+    "start": "next start --hostname 127.0.0.1 --port 4321",
+    "autostart:install": "bash scripts/install-autostart.sh",
+    "autostart:uninstall": "bash scripts/uninstall-autostart.sh",
+    "autostart:status": "bash scripts/status-autostart.sh",
     "lint": "eslint",
     "typecheck": "tsc --noEmit"
   },

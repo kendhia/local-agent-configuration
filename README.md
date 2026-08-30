@@ -15,6 +15,25 @@ pnpm dev
 
 Then open <http://localhost:4321>.
 
+## Start at Login
+
+On macOS, install a user LaunchAgent so the dashboard starts automatically when
+you log in:
+
+```bash
+pnpm autostart:install
+```
+
+The installer builds the app, starts it on <http://localhost:4321>, and writes
+logs to `~/Library/Logs/agent-config-dashboard/`.
+
+Useful commands:
+
+```bash
+pnpm autostart:status
+pnpm autostart:uninstall
+```
+
 ## What it shows
 
 **Root level** — configuration under your home directory, grouped by agent:
