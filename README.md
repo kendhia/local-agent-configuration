@@ -6,6 +6,12 @@ root-level ones under `~`, plus any project folders you point it at.
 Runs on your machine only — it reads and writes real files on disk and has no
 auth, so do not expose it to a network.
 
+## Screenshot
+
+The screenshot below uses sample data only.
+
+![Agent Configs dashboard showing a sanitized sample Codex config open in the editor](./public/screenshot.png)
+
 ## Run it
 
 ```bash
